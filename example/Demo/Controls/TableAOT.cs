@@ -353,6 +353,7 @@ namespace Demo.Controls
             AntdUI.CellBadge online = null;
             AntdUI.CellImage[] imgs = null;
             AntdUI.CellLink[] btns = null;
+            AntdUI.CellTable[] table = null;
 
             if (start == 1) online = new AntdUI.CellBadge(AntdUI.TState.Success, AntdUI.Localization.Get("Table.Data.Online", "‘⁄œﬂ"));
             else if (start == 2) online = new AntdUI.CellBadge(AntdUI.TState.Processing, AntdUI.Localization.Get("Table.Data.Online.Processing", "¥¶÷√"));
