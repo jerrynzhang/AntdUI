@@ -29,83 +29,110 @@ namespace AntdUI
 {
     partial class CellTable
     {
-        public override void PaintBack(Canvas g)
-        { }
+        public override void PaintBack(Canvas g) { }
 
         public override void Paint(Canvas g, Font font, bool enable, SolidBrush fore)
         {
-            using (var path = Rect.RoundPath(0))
+            // 定义表格行数和列数
+            int rowCount = 2;
+            int colCount = 1;
+
+            // 定义每个单元格的高度和宽度
+            float cellHeight = Rect.Height / rowCount;
+            float cellWidth = Rect.Width / colCount;
+
+            for (int row = 0; row < rowCount; row++) 
             {
-                #region 绘制背景
-
-                Color _fore, _back, _bor;
-                switch (Type)
+                for (int col = 0; col < colCount; col++) 
                 {
-                    case TTypeMini.Default:
-                        _back = Colour.TagDefaultBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.TagDefaultColor.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.DefaultBorder.Get("Table", PARENT.PARENT.ColorScheme);
-                        break;
+                    // 计算每个单元格的位置和大小
+                    RectangleF cellRect = new RectangleF(
+                        Rect.Left + col * cellWidth,
+                        Rect.Top + row * cellHeight,
+                        cellWidth,
+                        cellHeight);
 
-                    case TTypeMini.Error:
-                        _back = Colour.ErrorBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.Error.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.ErrorBorder.Get("Table", PARENT.PARENT.ColorScheme);
-                        break;
+                    using (var path = cellRect.RoundPath(0))
+                    {
+                        #region 绘制背景
 
-                    case TTypeMini.Success:
-                        _back = Colour.SuccessBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.Success.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.SuccessBorder.Get("Table", PARENT.PARENT.ColorScheme);
-                        break;
+                        Color _fore, _back, _bor;
+                        switch (Type)
+                        {
+                            case TTypeMini.Default:
+                                _back = Colour.TagDefaultBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.TagDefaultColor.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.DefaultBorder.Get("Table", PARENT.PARENT.ColorScheme);
+                                break;
 
-                    case TTypeMini.Info:
-                        _back = Colour.InfoBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.Info.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.InfoBorder.Get("Table", PARENT.PARENT.ColorScheme);
-                        break;
+                            case TTypeMini.Error:
+                                _back = Colour.ErrorBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.Error.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.ErrorBorder.Get("Table", PARENT.PARENT.ColorScheme);
+                                break;
 
-                    case TTypeMini.Warn:
-                        _back = Colour.WarningBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.Warning.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.WarningBorder.Get("Table  ", PARENT.PARENT.ColorScheme);
-                        break;
+                            case TTypeMini.Success:
+                                _back = Colour.SuccessBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.Success.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.SuccessBorder.Get("Table", PARENT.PARENT.ColorScheme);
+                                break;
 
-                    case TTypeMini.Primary:
-                    default:
-                        _back = Colour.PrimaryBg.Get("Table", PARENT.PARENT.ColorScheme);
-                        _fore = Colour.Primary.Get("Table", PARENT.PARENT.ColorScheme);
-                        _bor = Colour.Primary.Get("Table", PARENT.PARENT.ColorScheme);
-                        break;
+                            case TTypeMini.Info:
+                                _back = Colour.InfoBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.Info.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.InfoBorder.Get("Table", PARENT.PARENT.ColorScheme);
+                                break;
+
+                            case TTypeMini.Warn:
+                                _back = Colour.WarningBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.Warning.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.WarningBorder.Get("Table  ", PARENT.PARENT.ColorScheme);
+                                break;
+
+                            case TTypeMini.Primary:
+                            default:
+                                _back = Colour.PrimaryBg.Get("Table", PARENT.PARENT.ColorScheme);
+                                _fore = Colour.Primary.Get("Table", PARENT.PARENT.ColorScheme);
+                                _bor = Colour.Primary.Get("Table", PARENT.PARENT.ColorScheme);
+                                break;
+                        }
+
+                        if (Fore.HasValue) _fore = Fore.Value;
+                        if (Back.HasValue) _back = Back.Value;
+
+                        g.Fill(_back, path);
+
+                        if (borderWidth > 0) g.Draw(_bor, borderWidth * Config.Dpi, path);
+
+
+                        #endregion 绘制背景
+                        // 绘制单元格内容
+                        string cellContent;
+                        if (row == 0) cellContent = Key;
+                        else cellContent = Value;
+                        
+                        g.String(cellContent, font, _fore, cellRect, Table.StringFormat(ColumnAlign.Center));
+                    }
                 }
-
-                if (Fore.HasValue) _fore = Fore.Value;
-                if (Back.HasValue) _back = Back.Value;
-
-                g.Fill(_back, path);
-
-                if (borderWidth > 0) g.Draw(_bor, borderWidth * Config.Dpi, path);
-
-                #endregion 绘制背景
-
-                g.String(Key, font, _fore, Rect, Table.StringFormat(ColumnAlign.Center));
-            }           
+            }                   
         }
 
         public override Size GetSize(Canvas g, Font font, int gap, int gap2)
         {
-            var size = g.MeasureString(Key, font);
+            var keySize = g.MeasureString(Key, font);
+            var valueSize = g.MeasureString(Value, font);
+            var size = keySize = (keySize.Width > valueSize.Width) ? keySize : valueSize;
             if (Gap.HasValue)
             {
                 int sp = (int)(Gap.Value * Config.Dpi);
-                return new Size(size.Width + sp * 2, size.Height + sp);
+                return new Size(size.Width + sp * 2, size.Height * 2 + 2 * sp);
             }
             else if (PARENT.PARENT.GapCell.HasValue)
             {
                 int sp = (int)(PARENT.PARENT.GapCell.Value * Config.Dpi);
-                return new Size(size.Width + sp * 2, size.Height + sp);
+                return new Size(size.Width + sp * 2, size.Height * 2 + 2 * sp);
             }
-            else return new Size(size.Width + gap2, size.Height + gap);
+            else return new Size(size.Width + gap2, size.Height * 2 + gap);
         }
 
         public override void SetRect(Canvas g, Font font, Rectangle rect, Size size, int maxwidth, int gap, int gap2)
